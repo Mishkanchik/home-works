@@ -1,0 +1,65 @@
+﻿@model IEnumerable<Product>
+
+<div style="display: flex; align-items: center; justify-content: space-between;">
+    <h1>Продукти</h1>
+    <a class="btn btn-dark" asp-action="Create">Додати продукт</a>
+</div>
+
+@if (Model.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Price</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Image</th>
+                <th scope="col">Category</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var product in Model)
+            {
+                <tr>
+                    <td>@product.Id</td>
+                    <td>@product.Name</td>
+                    <td>@product.Description</td>
+                    <td>@product.Price</td>
+                    <td>@product.Amount</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(product.Image))
+                        {
+                            <img src="@product.Image" alt="Product Image" width="50" height="50" />
+                        }
+                        else
+                        {
+                            <span>Немає зображення</span>
+                        }
+                    </td>
+                    <td>@(product.Category != null ? product.Category.Name : "Без категорії")</td>
+                    <td>
+                        <form asp-action="Edit" method="post" style="display: inline;">
+                            <input type="hidden" name="id" value="@product.Id" />
+                            <button type="submit" class="btn btn-primary btn-sm">Редагувати</button>
+                        </form>
+
+                        <form asp-action="Delete" method="post" style="display: inline;">
+                            <input type="hidden" name="id" value="@product.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Ви впевнені, що хочете видалити @product.Name?');">
+                                Видалити
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <h2>Продуктів не знайдено</h2>
+}
