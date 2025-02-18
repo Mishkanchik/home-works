@@ -11,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 
+builder.Services.AddValidatorsFromAssemblyContaining<CategoryValidator>();
 
 //add FluentValidation
 

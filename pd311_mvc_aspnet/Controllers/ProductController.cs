@@ -2,10 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using pd311_mvc_aspnet.Data;
 using pd311_mvc_aspnet.Models;
-using System;
-using System.IO;
-using System.Linq;
-using Microsoft.AspNetCore.Http;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace pd311_mvc_aspnet.Controllers
@@ -82,32 +79,62 @@ namespace pd311_mvc_aspnet.Controllers
 
 
 
+        [HttpGet]
+        public IActionResult Edit(string id)
+        {
+            var product = _context.Products.FirstOrDefault(p => p.Id == id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["Categories"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
+            return View(product);
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-            public IActionResult Edit(Product model)
+        public IActionResult Edit(Product model, IFormFile ImageFile)
+        {
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                {
-                    ViewData["Categories"] = _context.Categories.ToList();
-                    return View(model);
-                }
-
-                var existingProduct = _context.Products.FirstOrDefault(p => p.Id == model.Id);
-                if (existingProduct == null)
-                {
-                    return NotFound();
-                }
-
-                existingProduct.Name = model.Name;
-                existingProduct.Description = model.Description;
-                existingProduct.Price = model.Price;
-                existingProduct.Amount = model.Amount;
-                existingProduct.CategoryId = model.CategoryId;
-
-                _context.SaveChanges();
-                return RedirectToAction("Index");
+                ViewData["Categories"] = new SelectList(_context.Categories, "Id", "Name", model.CategoryId);
+                return View(model);
             }
+
+            var existingProduct = _context.Products.FirstOrDefault(p => p.Id == model.Id);
+            if (existingProduct == null)
+            {
+                return NotFound();
+            }
+
+        
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + ImageFile.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    ImageFile.CopyTo(fileStream);
+                }
+
+                existingProduct.Image = "/images/" + uniqueFileName;
+            }
+
+           
+            existingProduct.Name = model.Name;
+            existingProduct.Description = model.Description;
+            existingProduct.Price = model.Price;
+            existingProduct.Amount = model.Amount;
+            existingProduct.CategoryId = model.CategoryId;
+
+            _context.SaveChanges();
+            return RedirectToAction("Index");
         }
+
     }
+}
 

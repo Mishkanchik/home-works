@@ -2,46 +2,53 @@
 
 <h2>Редагувати продукт</h2>
 
-<form asp-action="Edit" method="post">
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
     <input type="hidden" asp-for="Id" />
 
     <div class="mb-3">
         <label class="form-label">Назва</label>
-        <input type="text" class="form-control" asp-for="Name">
+        <input type="text" class="form-control" asp-for="Name" required>
         <span class="text-danger" asp-validation-for="Name"></span>
     </div>
 
     <div class="mb-3">
         <label class="form-label">Опис</label>
-        <textarea class="form-control" asp-for="Description"></textarea>
+        <textarea class="form-control" asp-for="Description" required minlength="20" maxlength="500"></textarea>
         <span class="text-danger" asp-validation-for="Description"></span>
     </div>
 
     <div class="mb-3">
         <label class="form-label">Ціна</label>
-        <input type="number" step="0.01" class="form-control" asp-for="Price">
+        <input type="number" step="0.01" class="form-control" asp-for="Price" required min="0.01">
         <span class="text-danger" asp-validation-for="Price"></span>
     </div>
 
     <div class="mb-3">
         <label class="form-label">Кількість</label>
-        <input type="number" class="form-control" asp-for="Amount">
+        <input type="number" class="form-control" asp-for="Amount" required min="0">
         <span class="text-danger" asp-validation-for="Amount"></span>
     </div>
 
     <div class="mb-3">
         <label class="form-label">Категорія</label>
-        <select class="form-control" asp-for="CategoryId">
+        <select class="form-control" asp-for="CategoryId" asp-items="ViewBag.Categories" required>
             <option value="">Оберіть категорію</option>
         </select>
         <span class="text-danger" asp-validation-for="CategoryId"></span>
     </div>
 
+
     <div class="mb-3">
-         <img src="@Model.Image" alt="Alternate Text" />
+        <label class="form-label">Поточне зображення</label>
+        
+            <img src="~/images/@Model.Image" alt="Зображення продукту" class="img-fluid" style="max-width: 200px;" />
+  
     </div>
 
-
+    <div class="mb-3">
+        <label class="form-label">Завантажити нове зображення</label>
+        <input type="file" class="form-control" name="ImageFile" accept="image/*">
+    </div>
 
     <button type="submit" class="btn btn-success">Зберегти</button>
     <a asp-action="Index" class="btn btn-secondary">Назад</a>
